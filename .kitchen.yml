@@ -4,10 +4,18 @@ driver:
 
 provisioner:
   name: salt_solo
+  formula: virtualbox
+  state_top:
+    base:
+      "*":
+        - virtualbox
+        - virtualbox.extpack
+        - virtualbox.webservice
+        - virtualbox.phpvirtualbox
 
 platforms:
-  - name: ubuntu-12.04
-  - name: centos-6.4
+  - name: ubuntu-12.04-i386
+  - name: debian-7.2.0-i386
 
 suites:
   - name: default
