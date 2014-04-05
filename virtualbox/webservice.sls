@@ -3,7 +3,7 @@
 vbox_webservice:
   user.present:
     - name: {{virtualbox.webservice_user}}
-    - password: {{virtualbox.webservice_password}}
+    - password: {{salt['cmd.exec_code']('python', 'import crypt; import base64; print crypt.crypt("'+virtualbox.webservice_password+'", "$6$"+base64.b64encode("'+virtualbox.webservice_user+'")[0:16]+"$")')}}
     - groups:
       - vboxusers
     - require:
