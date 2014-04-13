@@ -1,0 +1,9 @@
+virtualbox:
+  phpvirtualbox:
+    users:
+      bert: # login with password bert
+        sha512hash: ec2709cedbcfb9bbbed06dd977c7c4f0f3a9f6c553a6cf3db5ac28fcf64957ba7501d5f4e0bac0a85a2d4dc105e90ae1f088f23bdd2fafd358a3334618310184 
+        password: ignored-because-hash-is-given
+        admin: True
+      ernie:
+        password: plain-pillar-password

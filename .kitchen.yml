@@ -7,6 +7,13 @@ driver:
 provisioner:
   name: salt_solo
   formula: virtualbox
+  pillars-from-files:
+    virtualbox.sls: pillar.example
+  pillars:
+    top.sls:
+      base:
+        "*":
+          - virtualbox
   state_top:
     base:
       "*":
