@@ -1,9 +1,13 @@
 {% from "virtualbox/map.jinja" import virtualbox with context %}
 
 vbox_webservice:
+  {% set pw_salt = salt['cmd.exec_code']('python', 'import base64; print base64.b64encode("'+virtualbox.webservice.user+'")[0:16];') %}
+  {% set pw_hash = salt['cmd.exec_code']('python', 'import crypt; import base64; print crypt.crypt("'+virtualbox.webservice.password+'", "$6$'+pw_salt+'$")') %}
   user.present:
-    - name: {{virtualbox.webservice_user}}
-    - password: {{salt['cmd.exec_code']('python', 'import crypt; import base64; print crypt.crypt("'+virtualbox.webservice_password+'", "$6$"+base64.b64encode("'+virtualbox.webservice_user+'")[0:16]+"$")')}}
+    - name: {{virtualbox.webservice.user}}
+    - password: {{pw_hash}}
+    - system: True
+    - shell: /bin/false
     - groups:
       - vboxusers
     - require:
@@ -17,15 +21,15 @@ vbox_webservice:
     - contents: |
                 # this file is managed by salt
                 # any manual change will be reverted
-                VBOXWEB_USER={{virtualbox.webservice_user}}
+                VBOXWEB_USER={{virtualbox.webservice.user}}
     - require:
       - user: vbox_webservice
       - pkg: virtualbox
 
-  {% if virtualbox.webservice_machine_directory %} 
+  {% if virtualbox.webservice.machine_directory %} 
   cmd.run:
-    - name: vboxmanage setproperty machinefolder {{virtualbox.webservice_machine_directory}}
-    - root: {{virtualbox.webservice_user}}
+    - name: vboxmanage setproperty machinefolder {{virtualbox.webservice.machine_directory}}
+    - root: {{virtualbox.webservice.user}}
     - require:
       - user: vbox_webservice
   {% endif %}

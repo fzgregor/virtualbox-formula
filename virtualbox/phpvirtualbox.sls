@@ -5,10 +5,10 @@ unzip:
 
 phpvirtualbox:
   cmd.script:
-    - name: download_phpvirtualbox.sh {{virtualbox.version}} {{virtualbox.phpvirtualbox_directory}}
+    - name: download_phpvirtualbox.sh {{virtualbox.version}} {{virtualbox.phpvirtualbox.directory}}
     - source: salt://virtualbox/scripts/download_phpvirtualbox.sh
     - user: root
-    - unless: test -d {{virtualbox.phpvirtualbox_directory}}
+    - unless: test -d {{virtualbox.phpvirtualbox.directory}}
     - require:
       - pkg: unzip
       - pkg: apache-with-php
@@ -18,12 +18,12 @@ phpvirtualbox:
 
 phpvirtualbox-config:
   file.managed:
-    - name: {{virtualbox.phpvirtualbox_directory}}/config.php
+    - name: {{virtualbox.phpvirtualbox.directory}}/config.php
     - source: salt://virtualbox/files/phpvirtualbox-config.php
     - template: jinja
     - context:
-        username: {{virtualbox.webservice_user}} 
-        password: {{virtualbox.webservice_password}}
+        username: {{virtualbox.webservice.user}} 
+        password: {{virtualbox.webservice.password}}
     - require:
       - cmd: phpvirtualbox
 
@@ -43,9 +43,9 @@ phpvirtualbox_vhost_file:
   file.managed:
     - name: /etc/apache2/sites-available/phpvirtualbox
     - contents: |
-                Alias /phpvirtualbox {{virtualbox.phpvirtualbox_directory}}
+                Alias /phpvirtualbox {{virtualbox.phpvirtualbox.directory}}
 
-                <Directory {{virtualbox.phpvirtualbox_directory}}>
+                <Directory {{virtualbox.phpvirtualbox.directory}}>
                     DirectoryIndex index.html
                 </Directory>
     - require:
@@ -61,9 +61,9 @@ phpvirtualbox_vhost_enabled:
 
 phpvirtualbox_user_management_initialized:
   cmd.run:
-    - name: vboxmanaga setextradata global phpvb/usersSetup 1
+    - name: vboxmanage setextradata global phpvb/usersSetup 1
     - unless: "vboxmanage getextradata global phpvb/usersSetup | grep 'Value: 1'"
-    - user: {{virtualbox.webservice_user}}
+    - user: {{virtualbox.webservice.user}}
 
 {% for user, data in pillar.get('virtualbox').get('phpvirtualbox', {}).get('users', {}).items() %}
 phpvirtualbox_{{user}}_password:
@@ -75,7 +75,7 @@ phpvirtualbox_{{user}}_password:
     {% endif %}
     - name: vboxmanage setextradata global phpvb/users/{{user}}/pass {{hash}}
     - unless: vboxmanage getextradata global phpvb/users/{{user}}/pass | grep {{hash}}
-    - user: {{virtualbox.webservice_user}}
+    - user: {{virtualbox.webservice.user}}
 
 phpvirtualbox_{{user}}_admin:
   cmd.run:
@@ -86,6 +86,6 @@ phpvirtualbox_{{user}}_admin:
     - name: vboxmanage setextradata global phpvb/users/{{user}}/admin
     - onlyif: vboxmanage getextradata global phpvb/users/{{user}}/admin | grep 1
     {% endif %}
-    - user: {{virtualbox.webservice_user}} 
+    - user: {{virtualbox.webservice.user}} 
 
 {% endfor %}
