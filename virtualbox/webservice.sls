@@ -6,7 +6,11 @@ vbox_webservice:
   user.present:
     - name: {{virtualbox.webservice.user}}
     - password: {{pw_hash}}
+    {% if virtualbox.webservice.has_key('uid') %}
+    - uid: {{virtualbox.webservice.uid}}
+    {% endif %}
     - system: True
+    - home: {{virtualbox.webservice.home}}
     - shell: /bin/false
     - groups:
       - vboxusers
@@ -25,14 +29,6 @@ vbox_webservice:
     - require:
       - user: vbox_webservice
       - pkg: virtualbox
-
-  {% if virtualbox.webservice.machine_directory %} 
-  cmd.run:
-    - name: vboxmanage setproperty machinefolder {{virtualbox.webservice.machine_directory}}
-    - root: {{virtualbox.webservice.user}}
-    - require:
-      - user: vbox_webservice
-  {% endif %}
 
   service.running:
     - name: vboxweb-service
