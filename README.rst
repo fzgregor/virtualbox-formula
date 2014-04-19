@@ -21,6 +21,11 @@ Available states
 
 Install virtualbox package from oracle.
 
+.. note::
+
+    The first run of this state will probably take a long time.
+    The apt download of the package is often slow.
+
 ``virtualbox.webservice``
 -------------------------
 
@@ -44,7 +49,7 @@ Download and install the current Oracle VM VirtualBox Extension Pack.
 ----------------------------
 
 Download and install the latest phpvirtualbox.
-Apache is used to serve the webpages.
+Apache will serve the webinterface under http://ip/phpvirtualbox.
 
 
 TODO
