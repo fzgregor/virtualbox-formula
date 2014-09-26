@@ -37,3 +37,12 @@ vbox_webservice:
     - sig: vboxwebsrv
     - require:
       - file: vbox_webservice
+
+vbox_webservice_machine_folder:
+  cmd.run:
+    - name: vboxmanage setproperty machinefolder {{virtualbox.webservice.machine_folder}}
+    - unless: "vboxmanage list systemproperties | grep 'Default machine folder:' | grep {{virtualbox.webservice.machine_folder}}"
+    - user: {{virtualbox.webservice.user}}
+    - require:
+      - pkg: virtualbox
+      - user: vbox_webservice
