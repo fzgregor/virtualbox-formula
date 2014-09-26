@@ -1,12 +1,13 @@
 {% set virtualbox = {
   'version': '4.3',
   'webservice': {
-    'user' : 'vboxwebsrv',
-    'password' : 'a@#R0ojd',
-    'uid': 945,
-    'home' : '/var/lib/vboxwebsrv',
+    'user'           : 'vboxwebsrv',
+    'password'       : 'a@#R0ojd',
+    'uid'            : 945,
+    'home'           : '/var/lib/vboxwebsrv',
+    'machine_folder' : '/mnt/data/vboxuser',
   },
   'phpvirtualbox': {
-    'directory' : '/srv/phpvirtualbox',
+    'directory' : '/usr/share/phpvirtualbox',
   },
 } %}

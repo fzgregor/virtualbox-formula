@@ -1,5 +1,8 @@
 {% from "virtualbox/map.jinja" import virtualbox with context %}
 
+include:
+  - .webservice
+
 unzip:
   pkg.installed
 
@@ -10,6 +13,7 @@ phpvirtualbox:
     - user: root
     - unless: test -d {{virtualbox.phpvirtualbox.directory}}
     - require:
+      - pkg: virtualbox
       - pkg: unzip
       - pkg: apache-with-php
       - service: apache-with-php
@@ -41,7 +45,7 @@ apache-with-php:
 
 phpvirtualbox_vhost_file:
   file.managed:
-    - name: /etc/apache2/sites-available/phpvirtualbox
+    - name: /etc/apache2/sites-available/phpvirtualbox.conf
     - contents: |
                 Alias /phpvirtualbox {{virtualbox.phpvirtualbox.directory}}
 
@@ -53,8 +57,8 @@ phpvirtualbox_vhost_file:
 
 phpvirtualbox_vhost_enabled:
   file.symlink:
-    - name: /etc/apache2/sites-enabled/phpvirtualbox
-    - target: ../sites-available/phpvirtualbox
+    - name: /etc/apache2/sites-enabled/phpvirtualbox.conf
+    - target: ../sites-available/phpvirtualbox.conf
     - require:
       - file: phpvirtualbox_vhost_file
       - service: apache-with-php
@@ -65,7 +69,7 @@ phpvirtualbox_user_management_initialized:
     - unless: "vboxmanage getextradata global phpvb/usersSetup | grep 'Value: 1'"
     - user: {{virtualbox.webservice.user}}
 
-{% for user, data in pillar.get('virtualbox').get('phpvirtualbox', {}).get('users', {}).items() %}
+{% for user, data in pillar.get('virtualbox', {}).get('phpvirtualbox', {}).get('users', {}).items() %}
 phpvirtualbox_{{user}}_password:
   cmd.run:
     {% if data.has_key('sha512hash') %}
@@ -76,6 +80,8 @@ phpvirtualbox_{{user}}_password:
     - name: vboxmanage setextradata global phpvb/users/{{user}}/pass {{hash}}
     - unless: vboxmanage getextradata global phpvb/users/{{user}}/pass | grep {{hash}}
     - user: {{virtualbox.webservice.user}}
+    - require:
+      - pkg: virtualbox
 
 phpvirtualbox_{{user}}_admin:
   cmd.run:
@@ -87,5 +93,7 @@ phpvirtualbox_{{user}}_admin:
     - onlyif: vboxmanage getextradata global phpvb/users/{{user}}/admin | grep 1
     {% endif %}
     - user: {{virtualbox.webservice.user}} 
+    - require:
+      - pkg: virtualbox
 
 {% endfor %}
